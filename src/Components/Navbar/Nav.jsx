@@ -24,7 +24,7 @@ const Nav = () => {
                         <li><Link to="/ ">Home</Link></li>
                         <li><Link to="/tool ">TOOlS</Link></li>
                         <li><Link to="/about ">ABOUT</Link></li>
-                        <li><Link to="/contact ">CONTACT</Link></li>
+                        <li><Link to="/contact ">CONTACT US</Link></li>
                         <li className={nav.tap}><CiSearch /> <input type="search"  name="" onChange={(e) => setsearch(e.target.value)} id="" /> </li>
                     </ul>
                     <div className={nav.bugger} onClick={handbug}>
