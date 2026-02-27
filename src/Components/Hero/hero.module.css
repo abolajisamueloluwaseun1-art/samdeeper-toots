@@ -1,0 +1,75 @@
+.hero {
+    position: relative;
+    top: 100px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    /* padding: 1px 5px; */
+    background: url('https://www.vecteezy.com/video/2154910-blue-high-tech-vr-gui-hud-interface-loop') center no-repeat cover/center;
+    left: 0;
+}
+.hero .container{
+    max-width: 1300px;
+    margin: 120px auto;
+}
+.hero .content{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+}
+.hero .content h2{
+    font-size: 1.7rem;
+}
+.hero .content h3{
+    font-size: 1.7rem;
+}
+.hero .btnflex{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.hero .btnflex button{
+    padding: 5px 10px;
+    font-size: 1rem;
+    border: none;
+    background: #4646F7;
+    color: #fff;
+
+}
+.hero .contentb{
+    margin: 70px 30px;
+
+}
+.hero .contentb >h3{
+    font-size: 2.4rem;
+    margin: 0;
+   
+}
+.hero .contentb .stat{
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 1rem;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+@media only screen  and (max-width:940px) {
+    .hero .content h2{
+    font-size: 1.1rem;
+}
+.hero .content h3{
+    font-size: 1.1rem;
+}
+.hero .contentb{
+   margin: 70px 1rem;
+}
+.hero .contentb .stat{
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 1rem;
+   
+    justify-content: center;
+    align-items: center;
+}
+}

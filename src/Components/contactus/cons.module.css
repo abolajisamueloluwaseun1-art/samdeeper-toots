@@ -1,0 +1,84 @@
+.con{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    top: 120px;
+    overflow: hidden;
+}
+.con .container{
+    max-width: 1300px;
+    margin: 100px auto;
+}
+.con .container .flex h2{
+    font-size: 2rem;
+}
+.con .container .flex p{
+    font-size: 1.6rem;
+}
+
+.con .content{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+}
+.con .name {
+    margin: 10px 0;
+}
+.con .name label{
+    display: block;
+    margin: 20px 0;
+    font-size: 1.3rem;
+}
+.con .name input{
+    width: 50vw;
+    padding: 15px 10px;
+   
+}
+.con .name input:focus{
+    outline: none;
+}
+.con .mass label{
+    display: block;
+    margin: 20px 0;
+    font-size: 1.3rem;
+}
+.con .mass textarea{
+    width: 50vw;
+    padding: 15px 10px;
+   
+}
+.con .mass input:focus{
+    outline: none;
+}
+.con form button{
+    padding: 10px 30px;
+    background: #4646F7;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    margin: 10px 0;
+}
+.con form button:hover{
+    transform: scale(1.1, 1.4);
+}
+@media only screen and (max-width:940px) {
+    .con .name input{
+    width: 90%;
+    padding: 15px 10px;
+   
+}
+    .con .mass textarea{
+    width: 90%;
+    padding: 15px 10px;
+   
+}
+.con .content{
+    display: block;
+
+}
+ .con{
+    margin: 0 5px;
+}
+}

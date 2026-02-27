@@ -1,0 +1,33 @@
+.fea{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    top: 100px;
+    
+}
+.fea .container{
+    max-width: 1300px;
+    margin: 120px auto;
+    /* text-align: center; */
+}
+.fea .content{
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 1rem;
+}
+.fea .toolsflex{
+    text-align: center;
+    background: #e3e3e3;
+    margin: 0 10px;
+    padding: 0.5rem;
+}
+.fea .toolsflex img{
+    width: 20%;
+    height: 20%;
+}
+@media only screen and (max-width:940px) {
+    .fea .content{
+    display: grid;
+    grid-template-columns: repeat(1,1fr);
+}
+}
