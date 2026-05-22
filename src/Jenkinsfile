@@ -37,7 +37,7 @@ pipeline {
             steps {
                 sh '''
                 test -f build/index.html
-                CI=true npm test
+                CI=true npm test -- --watchAll=false --reporters=default --reporters=jest-junit
                 '''
             }
         }
@@ -62,10 +62,6 @@ pipeline {
     }
 
     post {
-
-        always {
-            junit 'test-results/junit.xml'
-        }
 
         success {
             echo 'Pipeline completed - app deployed to Render!'
