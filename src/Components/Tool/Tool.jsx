@@ -9,7 +9,7 @@ const Tool= () => {
         <div className={fea.content}>
           
             {homeData.featuredTools.map((featuredTool) => (
-              <div className={fea.toolsflex}>
+              <div className={fea.toolsflex} key={featuredTool.slug}>
               <h3>{featuredTool.name}</h3>
               <h4>{featuredTool.slug}</h4>
               <p>{featuredTool.category}</p>
