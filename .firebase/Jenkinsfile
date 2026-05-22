@@ -52,10 +52,9 @@ pipeline {
             }
 
             steps {
-                withCredentials([string(credentialsId: 'render-api-key', variable: 'RENDER_API_KEY')]) {
+                withCredentials([string(credentialsId: 'NETLIFY_HOOK', variable: 'NETLIFY_HOOK')]) {
                     sh '''
-                    npm install -g render-cli
-                    render deploy --service-id srv-abc123 --api-key $RENDER_API_KEY
+                    curl -X POST -d {} https://api.netlify.com/build_hooks/6a1070ba8c5b42d257bb1922
                     '''
                 }
             }
