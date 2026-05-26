@@ -42,7 +42,7 @@ pipeline {
             }
         }
 
-        stage('Deploy to render') {
+        stage('Deploy to Netlify') {
 
             agent {
                 docker {
@@ -54,7 +54,7 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'NETLIFY_HOOK', variable: 'NETLIFY_HOOK')]) {
                     sh '''
-                    curl -X POST -d {} https://api.netlify.com/build_hooks/6a1070ba8c5b42d257bb1922
+                    curl --fail --silent --show-error -X POST -d '{}' "$NETLIFY_HOOK"
                     '''
                 }
             }
@@ -68,7 +68,7 @@ pipeline {
         }
 
         success {
-            echo 'Pipeline completed - app deployed to Render!'
+            echo 'Pipeline completed - app deployed to Netlify!'
         }
 
         failure {
