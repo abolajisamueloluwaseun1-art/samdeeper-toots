@@ -5,6 +5,23 @@ pipeline {
         githubPush()
     }
 
+stage('SonarQube Analysis') {
+            environment {
+                SCANNER_HOME = tool 'SonarScanner'
+            }
+
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                        $SCANNER_HOME/bin/sonar-scanner \
+                        -Dsonar.projectKey=samdeeper-toots \
+                        -Dsonar.sources=. \
+                        -Dsonar.sourceEncoding=UTF-8
+                    '''
+                }
+            }
+        }
+
     stages {
         stage('Build') {
             agent {
@@ -41,6 +58,8 @@ pipeline {
                 '''
             }
         }
+
+        
 
         stage('Deploy to render') {
 
