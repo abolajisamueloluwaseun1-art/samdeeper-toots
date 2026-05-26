@@ -43,14 +43,17 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            environment {
-                SCANNER_HOME = tool 'SonarScanner'
+            agent {
+                docker {
+                    image 'sonarsource/sonar-scanner-cli:latest'
+                    reuseNode true
+                }
             }
 
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
-                    $SCANNER_HOME/bin/sonar-scanner \
+                    sonar-scanner \
                     -Dsonar.projectKey=samdeeper-toots \
                     -Dsonar.sources=. \
                     -Dsonar.sourceEncoding=UTF-8
