@@ -5,6 +5,23 @@ pipeline {
         githubPush()
     }
 
+stage('SonarQube Analysis') {
+            environment {
+                SCANNER_HOME = tool 'SonarScanner'
+            }
+
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                        $SCANNER_HOME/bin/sonar-scanner \
+                        -Dsonar.projectKey=samdeeper-toots \
+                        -Dsonar.sources=. \
+                        -Dsonar.sourceEncoding=UTF-8
+                    '''
+                }
+            }
+        }
+
     stages {
         stage('Build') {
             agent {
@@ -37,12 +54,14 @@ pipeline {
             steps {
                 sh '''
                 test -f build/index.html
-                CI=true JEST_JUNIT_OUTPUT_DIR=test-results JEST_JUNIT_OUTPUT_NAME=junit.xml npm test -- --watchAll=false --reporters=default --reporters=jest-junit
+                CI=true npm test -- --watchAll=false --reporters=default --reporters=jest-junit
                 '''
             }
         }
 
-        stage('Deploy to Netlify') {
+        
+
+        stage('Deploy to render') {
 
             agent {
                 docker {
@@ -54,7 +73,7 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'NETLIFY_HOOK', variable: 'NETLIFY_HOOK')]) {
                     sh '''
-                    curl --fail --silent --show-error -X POST -d '{}' "$NETLIFY_HOOK"
+                    curl -X POST -d {} https://api.netlify.com/build_hooks/6a1070ba8c5b42d257bb1922
                     '''
                 }
             }
@@ -63,12 +82,8 @@ pipeline {
 
     post {
 
-        always {
-            junit 'test-results/junit.xml'
-        }
-
         success {
-            echo 'Pipeline completed - app deployed to Netlify!'
+            echo 'Pipeline completed - app deployed to Render!'
         }
 
         failure {
