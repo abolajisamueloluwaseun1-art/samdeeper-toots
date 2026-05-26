@@ -5,23 +5,6 @@ pipeline {
         githubPush()
     }
 
-stage('SonarQube Analysis') {
-            environment {
-                SCANNER_HOME = tool 'SonarScanner'
-            }
-
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh '''
-                        $SCANNER_HOME/bin/sonar-scanner \
-                        -Dsonar.projectKey=samdeeper-toots \
-                        -Dsonar.sources=. \
-                        -Dsonar.sourceEncoding=UTF-8
-                    '''
-                }
-            }
-        }
-
     stages {
         stage('Build') {
             agent {
@@ -59,9 +42,24 @@ stage('SonarQube Analysis') {
             }
         }
 
-        
+        stage('SonarQube Analysis') {
+            environment {
+                SCANNER_HOME = tool 'SonarScanner'
+            }
 
-        stage('Deploy to render') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                    $SCANNER_HOME/bin/sonar-scanner \
+                    -Dsonar.projectKey=samdeeper-toots \
+                    -Dsonar.sources=. \
+                    -Dsonar.sourceEncoding=UTF-8
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to Netlify') {
 
             agent {
                 docker {
@@ -73,7 +71,7 @@ stage('SonarQube Analysis') {
             steps {
                 withCredentials([string(credentialsId: 'NETLIFY_HOOK', variable: 'NETLIFY_HOOK')]) {
                     sh '''
-                    curl -X POST -d {} https://api.netlify.com/build_hooks/6a1070ba8c5b42d257bb1922
+                    curl --fail --silent --show-error -X POST -d '{}' "$NETLIFY_HOOK"
                     '''
                 }
             }
@@ -83,7 +81,7 @@ stage('SonarQube Analysis') {
     post {
 
         success {
-            echo 'Pipeline completed - app deployed to Render!'
+            echo 'Pipeline completed - app deployed to Netlify!'
         }
 
         failure {
