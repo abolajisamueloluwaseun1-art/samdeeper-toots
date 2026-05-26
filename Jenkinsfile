@@ -1,80 +1,111 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = "samdeeper-toots"
+        CONTAINER_NAME = "samdeeper-toots-container"
+    }
+
+    tools {
+        nodejs 'NodeJS'
+    }
+
     triggers {
         githubPush()
     }
 
     stages {
-        stage('Build') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
 
+        stage('Checkout Code') {
             steps {
-                sh '''
-                ls -la
-                node --version
-                npm --version
-                npm ci --cache /tmp/.npm-cache
-                npm run build
-                ls -la
-                '''
+                checkout scm
             }
         }
 
-        stage('Test') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
-
+        stage('Install Dependencies') {
             steps {
-                sh '''
-                test -f build/index.html
-                CI=true npm test -- --watchAll=false --reporters=default --reporters=jest-junit
-                '''
+                sh 'npm install'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh 'CI=true npm test -- --watchAll=false --coverage'
             }
         }
 
         stage('SonarQube Analysis') {
-            agent {
-                docker {
-                    image 'sonarsource/sonar-scanner-cli:latest'
-                    reuseNode true
-                }
+            environment {
+                SCANNER_HOME = tool 'SonarScanner'
             }
-
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
-                    export SONAR_USER_HOME="$WORKSPACE/.sonar"
-                    mkdir -p "$SONAR_USER_HOME"
-                    sonar-scanner \
-                    -Dproject.settings=src/sonar-project.properties
+                        $SCANNER_HOME/bin/sonar-scanner \
+                        -Dsonar.projectKey=samdeeper-toots \
+                        -Dsonar.projectName=samdeeper-toots \
+                        -Dsonar.sources=. \
+                        -Dsonar.sourceEncoding=UTF-8 \
+                        -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+                        -Dsonar.exclusions=node_modules/**,coverage/**,build/**
                     '''
                 }
             }
         }
 
-        stage('Deploy to Netlify') {
-
-            agent {
-                docker {
-                    image 'node:18'
-                    reuseNode true
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
                 }
             }
+        }
 
+        stage('Build Docker Image') {
             steps {
-                withCredentials([string(credentialsId: 'NETLIFY_HOOK', variable: 'NETLIFY_HOOK')]) {
+                sh 'docker build --no-cache -t $IMAGE_NAME .'
+            }
+        }
+
+        stage('Stop Existing Container') {
+            steps {
+                sh '''
+                    docker stop $CONTAINER_NAME || true
+                    docker rm $CONTAINER_NAME || true
+                '''
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                sh '''
+                    docker run -d \
+                    --name $CONTAINER_NAME \
+                    -p 3051:80 \
+                    $IMAGE_NAME
+                '''
+            }
+        }
+
+        stage('Deploy to Render & Netlify') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'RENDER_API_KEY', variable: 'RENDER_API_KEY'),
+                    string(credentialsId: 'SERVICE_ID', variable: 'SERVICE_ID'),
+                    string(credentialsId: 'NETLIFY_HOOK', variable: 'NETLIFY_HOOK')
+                ]) {
                     sh '''
-                    curl --fail --silent --show-error -X POST -d '{}' "$NETLIFY_HOOK"
+                        # Trigger Render deploy
+                        curl -X POST \
+                        -H "Authorization: Bearer $RENDER_API_KEY" \
+                        -H "Content-Type: application/json" \
+                        "https://api.render.com/v1/services/$SERVICE_ID/deploys"
+
+                        # Trigger Netlify deploy hook
+                        curl -X POST \
+                        -H "Content-Type: application/json" \
+                        -d '{}' \
+                        "$NETLIFY_HOOK"
                     '''
                 }
             }
@@ -82,13 +113,14 @@ pipeline {
     }
 
     post {
-
-        success {
-            echo 'Pipeline completed - app deployed to Netlify!'
+        always {
+            echo 'Pipeline execution finished.'
         }
-
+        success {
+            echo 'Pipeline completed successfully!'
+        }
         failure {
-            echo 'Pipeline failed - deployment skipped.'
+            echo 'Pipeline failed.'
         }
     }
 }
