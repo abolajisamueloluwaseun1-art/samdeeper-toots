@@ -53,10 +53,10 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
+                    export SONAR_USER_HOME="$WORKSPACE/.sonar"
+                    mkdir -p "$SONAR_USER_HOME"
                     sonar-scanner \
-                    -Dsonar.projectKey=samdeeper-toots \
-                    -Dsonar.sources=. \
-                    -Dsonar.sourceEncoding=UTF-8
+                    -Dproject.settings=src/sonar-project.properties
                     '''
                 }
             }
