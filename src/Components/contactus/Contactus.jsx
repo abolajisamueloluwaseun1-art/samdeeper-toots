@@ -60,7 +60,7 @@ const Contactus = () => {
                         <label htmlFor="">Your Name</label>
                         <textarea name="" id="" onChange={(e) => setmessage(e.target.value)} placeholder='Message' required></textarea>
                     </div>
-                    <button onClick={send}>Send Message</button>
+                    <button type="button" onClick={send}>Send Message</button>
                 </form>
             </div>
         </div>

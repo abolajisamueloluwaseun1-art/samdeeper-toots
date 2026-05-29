@@ -41,13 +41,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
-                        $SCANNER_HOME/bin/sonar-scanner \
-                        -Dsonar.projectKey=samdeeper-toots \
-                        -Dsonar.projectName=samdeeper-toots \
-                        -Dsonar.sources=. \
-                        -Dsonar.sourceEncoding=UTF-8 \
-                        -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-                        -Dsonar.exclusions=node_modules/**,coverage/**,build/**
+                        $SCANNER_HOME/bin/sonar-scanner
                     '''
                 }
             }
